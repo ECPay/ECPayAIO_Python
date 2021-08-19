@@ -4,6 +4,7 @@ import hashlib
 import copy
 import requests
 import json
+import pprint
 from decimal import Decimal
 from urllib.parse import quote_plus, parse_qsl, parse_qs
 
@@ -183,6 +184,14 @@ InvType = {
     'Special': '08',  # 特種稅額
 }
 
+"""
+銀聯卡交易選項
+"""
+UnionPay = {
+    'Select': 0,  # 消費者於交易頁面可選擇是否使用銀聯交易
+    'Only': 1,  # 只使用銀聯卡交易, 且綠界會將交易頁面直接導到銀聯網站
+    'Hidden': 2,  # 不可使用銀聯卡, 綠界會將交易頁面隱藏銀聯選項
+}
 
 class BasePayment(object):
 
@@ -411,10 +420,8 @@ class CreateOrder(BasePayment):
         "InvType": {'type': str, 'required': True, 'max': 2},
     }
 
-    __final_merge_parameters = dict()
-    __check_pattern = []
-
     def create_order(self, client_parameters):
+        self.__check_pattern = []
         # 先用 required.dict 設定預設值並產生新 new.required.dict
         default_parameters = dict()
         default_parameters = self.create_default_dict(
@@ -565,11 +572,12 @@ class CreateOrder(BasePayment):
 
             urlencode_parameters = ['CustomerName', 'CustomerAddr', 'CustomerEmail',
                                     'InvoiceItemName', 'InvoiceItemWord', 'InvoiceRemark']
-            
+
             for urlencode_parameter in urlencode_parameters:
                 for k, v in client_parameters.items():
                     if urlencode_parameter == k:
-                        client_parameters.update({k: quote_plus(str(v)).lower()})
+                        client_parameters.update(
+                            {k: quote_plus(str(v)).lower()})
 
         # 用 new.required.dict 與 client.dict 合併為 merge.dict
         self.final_merge_parameters = super().merge(
@@ -595,10 +603,9 @@ class OrderSearch(BasePayment):
     }
 
     __url = 'https://payment.ecpay.com.tw/Cashier/QueryTradeInfo/V5'
-    __final_merge_parameters = dict()
-    __check_pattern = []
 
     def order_search(self, action_url=__url, client_parameters={}):
+        self.__check_pattern = []
         if action_url is None:
             action_url = self.__url
         # 先用 required.dict 設定預設值並產生新 new.required.dict
@@ -637,10 +644,9 @@ class OrderSearchPeriodic(BasePayment):
     }
 
     __url = 'https://payment.ecpay.com.tw/Cashier/QueryCreditCardPeriodInfo'
-    __final_merge_parameters = dict()
-    __check_pattern = []
 
     def order_search_period(self, action_url=__url, client_parameters={}):
+        self.__check_pattern = []
         if action_url is None:
             action_url = self.__url
         # 先用 required.dict 設定預設值並產生新 new.required.dict
@@ -678,10 +684,9 @@ class CreditDoAction(BasePayment):
     }
 
     __url = 'https://payment.ecpay.com.tw/CreditDetail/DoAction'
-    __final_merge_parameters = dict()
-    __check_pattern = []
 
     def credit_do_action(self, action_url=__url, client_parameters={}):
+        self.__check_pattern = []
         if action_url is None:
             action_url = self.__url
         # 先用 required.dict 設定預設值並產生新 new.required.dict
@@ -723,10 +728,9 @@ class DownloadMerchantBalance(BasePayment):
     }
 
     __url = 'https://vendor.ecpay.com.tw/PaymentMedia/TradeNoAio'
-    __final_merge_parameters = dict()
-    __check_pattern = []
 
     def download_merchant_balance(self, action_url=__url, client_parameters={}):
+        self.__check_pattern = []
         if action_url is None:
             action_url = self.__url
         # 先用 required.dict 設定預設值並產生新 new.required.dict
@@ -763,10 +767,9 @@ class SearchSingleTransaction(BasePayment):
     }
 
     __url = 'https://payment.ecPay.com.tw/CreditDetail/QueryTrade/V2'
-    __final_merge_parameters = dict()
-    __check_pattern = []
 
     def search_single_transaction(self, action_url=__url, client_parameters={}):
+        self.__check_pattern = []
         if action_url is None:
             action_url = self.__url
         # 先用 required.dict 設定預設值並產生新 new.required.dict
@@ -804,10 +807,9 @@ class DownloadDisbursementBalance(BasePayment):
     }
 
     __url = 'https://payment.ecPay.com.tw/CreditDetail/FundingReconDetail'
-    __final_merge_parameters = dict()
-    __check_pattern = []
 
     def download_disbursement_balance(self, action_url=__url, client_parameters={}):
+        self.__check_pattern = []
         if action_url is None:
             action_url = self.__url
         # 先用 required.dict 設定預設值並產生新 new.required.dict
