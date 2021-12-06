@@ -537,11 +537,11 @@ class CreateOrder(BasePayment):
 
             # 當列印註記 Print 為 1 (列印)時，則 CustomerName 與 CustomerAddr 參數必須有值
             print_param = client_parameters.get('Print')
-            if (print_param is '1') and (not client_parameters.get('CustomerName')):
+            if (print_param == '1') and (not client_parameters.get('CustomerName')):
                 raise Exception('CustomerName have to fill value.')
-            if (print_param is '1') and (not client_parameters.get('CustomerAddr')):
+            if (print_param == '1') and (not client_parameters.get('CustomerAddr')):
                 raise Exception('CustomerAddr have to fill value.')
-            if (print_param is '1') and client_parameters.get('CarruerType'):
+            if (print_param == '1') and client_parameters.get('CarruerType'):
                 raise Exception(
                     'CarruerType do not fill any value, when Print is "1".')
 
