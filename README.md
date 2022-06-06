@@ -11,6 +11,7 @@
   * 超商代碼
   * 超商條碼
   * Google Pay (須特別申請才能使用)(原Android Pay)
+  * Apple Pay
 
 ### 2. 安裝環境
 
