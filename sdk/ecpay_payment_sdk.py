@@ -18,6 +18,7 @@ ChoosePayment = {
     'ATM': 'ATM',  # 自動櫃員機
     'CVS': 'CVS',  # 超商代碼
     'BARCODE': 'BARCODE',  # 超商條碼 (若為手機版時不支援)
+    'ApplePay': 'ApplePay',  # ApplePay (僅支援Safari瀏覽器)
     'ALL': 'ALL',  # 不指定付款方式，由綠界顯示付款方式選擇頁面。
 }
 
@@ -59,6 +60,7 @@ ChooseSubPayment = {
     'BARCODE': 'BARCODE',  # 超商條碼繳款
     'Credit': 'Credit',  # 信用卡 (MasterCard/JCB/VISA)
     'GooglePay': 'GooglePay',  # GooglePay
+    'ApplePay': '',  # ApplePay
 }
 
 """
@@ -93,6 +95,7 @@ ReplyPaymentType = {
     'BARCODE_BARCODE': '超商條碼繳款',
     'Credit_CreditCard': '信用卡',
     'GooglePay': 'GooglePay',
+    'ApplePay': 'ApplePay',
 }
 
 """
@@ -380,7 +383,7 @@ class CreateOrder(BasePayment):
         "UnionPay": {'type': int, 'required': False, },
     }
 
-    # 使用 ALL 或 Credit 付款方式: 分期付款(三擇一)
+    # 使用 ALL 或 Credit 付款方式: 分期付款、圓夢分期付款(三擇一)
     __CREDIT_EXTEND_PARAMETERS_4 = {
         "CreditInstallment": {'type': str, 'required': True, 'max': 20},
     }
@@ -487,7 +490,7 @@ class CreateOrder(BasePayment):
                     self.__CREDIT_EXTEND_PARAMETERS_3)
                 self.__check_pattern.append(self.__CREDIT_EXTEND_PARAMETERS_3)
 
-            # 使用 ALL 或 Credit 付款方式: 分期付款(三擇一)
+            # 使用 ALL 或 Credit 付款方式: 分期付款、圓夢分期付款(三擇一)
             elif client_parameters.get('CreditInstallment'):
                 credit_extend_parameters = self.create_default_dict(
                     self.__CREDIT_EXTEND_PARAMETERS_4)

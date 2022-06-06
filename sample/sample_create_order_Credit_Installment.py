@@ -41,8 +41,9 @@ extend_params_1 = {
     'MerchantMemberID': '',
 }
 
+# 分期付款：3,6,12,18,24  圓夢分期付款(TotalAmount須大於圓夢彈性分期最低交易金額)：30N
 extend_params_2 = {
-    'CreditInstallment': '3,6,12,18,24',
+    'CreditInstallment': '3,6,12,18,24' or '30N',
 }
 
 extend_params_3 = {
