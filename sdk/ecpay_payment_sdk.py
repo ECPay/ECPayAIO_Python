@@ -234,7 +234,8 @@ class BasePayment(object):
             else:
                 raise Exception('unsupported type!')
         for k, v in parameters.items():
-            if v.get('default'):
+            #if v.get('default'):
+            if 'default' in v:
                 default_dict[k] = v.get('default')
         return default_dict
 
