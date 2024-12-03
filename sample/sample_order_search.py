@@ -17,9 +17,9 @@ order_search_params = {
 
 # 建立實體
 ecpay_payment_sdk = module.ECPayPaymentSdk(
-    MerchantID='2000132',
-    HashKey='5294y06JbISpM5x9',
-    HashIV='v77hoKGq4kWxNNIS'
+    MerchantID='3002607',
+    HashKey='pwFHCqoQZGmho4w6',
+    HashIV='EkRm7iFT261dpevs'
 )
 
 try:
