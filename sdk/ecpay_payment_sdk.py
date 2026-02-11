@@ -19,6 +19,10 @@ ChoosePayment = {
     'CVS': 'CVS',  # 超商代碼
     'BARCODE': 'BARCODE',  # 超商條碼 (若為手機版時不支援)
     'ApplePay': 'ApplePay',  # ApplePay (僅支援Safari瀏覽器)
+    'BNPL': 'BNPL',  # BNPL無卡分期(裕富/中租)
+    'DigitalPayment': 'DigitalPayment',  # 數位支付(街口支付/一卡通)
+    'TWQR': 'TWQR',  # 歐付寶TWQR行動支付
+    'WeiXin': 'WeiXin',  # 微信支付
     'ALL': 'ALL',  # 不指定付款方式，由綠界顯示付款方式選擇頁面。
 }
 
@@ -61,6 +65,16 @@ ChooseSubPayment = {
     'Credit': 'Credit',  # 信用卡 (MasterCard/JCB/VISA)
     'GooglePay': 'GooglePay',  # GooglePay
     'ApplePay': '',  # ApplePay
+    'BNPL': {
+        'URICH': 'URICH',  # 裕富數位無卡分期
+        'ZINGALA': 'ZINGALA',  # 中租銀角零卡
+    },
+    'DigitalPayment': {
+        'Jkopay': 'Jkopay',  # 街口支付
+        'iPASS': 'iPASS',  # 一卡通電子支付 iPASS MONEY (即將支援)
+    },
+    'TWQR': '',  # 歐付寶TWQR行動支付
+    'WeiXin': '',  # 微信支付
 }
 
 """
@@ -96,6 +110,12 @@ ReplyPaymentType = {
     'Credit_CreditCard': '信用卡',
     'GooglePay': 'GooglePay',
     'ApplePay': 'ApplePay',
+    'BNPL_URICH': '裕富數位無卡分期',
+    'BNPL_ZINGALA': '中租銀角零卡',
+    'DigitalPayment_Jkopay': '街口支付',
+    'DigitalPayment_iPASS': '一卡通電子支付',
+    'TWQR': '歐付寶TWQR行動支付',
+    'WeiXin': '微信支付',
 }
 
 """
@@ -838,13 +858,55 @@ class DownloadDisbursementBalance(BasePayment):
         return response.text
 
 
+class CreditCardPeriodAction(BasePayment):
+
+    # 信用卡定期定額訂單作業參數
+    __CREDIT_CARD_PERIOD_ACTION_PARAMETERS = {
+        'MerchantID': {'type': str, 'required': True, 'max': 10},
+        'MerchantTradeNo': {'type': str, 'required': True, 'max': 20},
+        'Action': {'type': str, 'required': True, 'max': 20},
+        'TimeStamp': {'type': int, 'required': True, },
+        'PlatformID': {'type': str, 'required': False, 'max': 10},
+    }
+
+    __url = 'https://payment.ecpay.com.tw/Cashier/CreditCardPeriodAction'
+
+    def credit_card_period_action(self, action_url=__url, client_parameters={}):
+        self.__check_pattern = []
+        if action_url is None:
+            action_url = self.__url
+        # 先用 required.dict 設定預設值並產生新 new.required.dict
+        default_parameters = dict()
+        default_parameters = self.create_default_dict(
+            self.__CREDIT_CARD_PERIOD_ACTION_PARAMETERS)
+        self.__check_pattern.append(
+            self.__CREDIT_CARD_PERIOD_ACTION_PARAMETERS)
+
+        # 用 new.required.dict 與 client.dict 合併為 merge.dict
+        self.final_merge_parameters = super().merge(
+            default_parameters, client_parameters)
+
+        # 檢查參數, 並產生 CheckMacValue
+        self.final_merge_parameters = self.integrate_parameter(
+            self.final_merge_parameters,
+            self.__check_pattern)
+
+        # 回傳給 client
+        response = super().send_post(
+            action_url, self.final_merge_parameters)
+        query = dict(parse_qsl(response.text, keep_blank_values=True))
+
+        return query
+
+
 """
 主程式
 """
 a = [CreateOrder, OrderSearch,
      OrderSearchPeriodic, CreditDoAction,
      DownloadMerchantBalance, SearchSingleTransaction,
-     DownloadDisbursementBalance, ExtendFunction]
+     DownloadDisbursementBalance, CreditCardPeriodAction,
+     ExtendFunction]
 
 
 class ECPayPaymentSdk(*a):
